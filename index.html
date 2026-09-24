@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yeisson · Git Helper</title>
+<meta name="description" content="Beginner-friendly help with Git, GitHub and VS Code.">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --text: #1b1f24;
+    --muted: #5b6573;
+    --border: #e1e5ea;
+    --accent: #1f883d;
+    --accent-soft: #e6f4ea;
+    --term-bg: #0d1117;
+    --term-text: #c9d1d9;
+    --term-green: #3fb950;
+    --term-blue: #79c0ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --text: #e6edf3;
+      --muted: #8d96a0;
+      --border: #30363d;
+      --accent: #3fb950;
+      --accent-soft: #12261a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --text: #e6edf3;
+    --muted: #8d96a0;
+    --border: #30363d;
+    --accent: #3fb950;
+    --accent-soft: #12261a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+  code, .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav { display: flex; justify-content: space-between; align-items: center; height: 60px; }
+  .logo { font-weight: 700; }
+  .logo span { color: var(--accent); }
+  .lang-btn {
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
+  }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding: 64px 0; }
+  .badge {
+    display: inline-block; background: var(--accent-soft); color: var(--accent);
+    padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; margin-bottom: 16px;
+  }
+  h1 { font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin-bottom: 16px; }
+  .lead { color: var(--muted); font-size: 18px; margin-bottom: 24px; }
+  .btn {
+    display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+    padding: 12px 22px; border-radius: 8px; font-weight: 600;
+  }
+  .btn:hover { opacity: .9; }
+
+  .terminal {
+    background: var(--term-bg); color: var(--term-text); border-radius: 10px;
+    padding: 16px 18px; font-size: 14px; min-height: 230px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18); overflow-x: auto;
+  }
+  .dots { display: flex; gap: 6px; margin-bottom: 14px; }
+  .dots i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .dots i:nth-child(1) { background: #ff5f56; }
+  .dots i:nth-child(2) { background: #ffbd2e; }
+  .dots i:nth-child(3) { background: #27c93f; }
+  .terminal .p { color: var(--term-green); }
+  .terminal .o { color: var(--term-blue); }
+  .cursor { display: inline-block; width: 8px; background: var(--term-text); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Sections */
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: 28px; margin-bottom: 8px; }
+  .sub { color: var(--muted); margin-bottom: 32px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+  }
+  .card .icon { font-size: 26px; margin-bottom: 8px; }
+  .card h3 { font-size: 17px; margin-bottom: 6px; }
+  .card p { color: var(--muted); font-size: 15px; }
+  .card a { color: var(--accent); font-weight: 600; text-decoration: none; font-size: 14px; }
+
+  .steps { counter-reset: s; }
+  .steps .card h3::before {
+    counter-increment: s; content: counter(s);
+    display: inline-grid; place-items: center; width: 26px; height: 26px; margin-right: 8px;
+    border-radius: 50%; background: var(--accent); color: #fff; font-size: 14px;
+  }
+
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 15px; }
+  th { background: var(--accent-soft); }
+  td code { color: var(--accent); font-weight: 600; }
+  .table-wrap { overflow-x: auto; }
+
+  .cta { text-align: center; }
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 32px 0; border-top: 1px solid var(--border); }
+
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; padding: 40px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo mono">yeisson<span>@git</span>:~$</div>
+    <button class="lang-btn" id="langBtn">🇪🇸 Español</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <span class="badge" data-en="For beginners" data-es="Para principiantes">For beginners</span>
+      <h1 data-en="I help you start with Git, GitHub & VS Code — step by step."
+          data-es="Te ayudo a empezar con Git, GitHub y VS Code, paso a paso.">
+        I help you start with Git, GitHub &amp; VS Code — step by step.
+      </h1>
+      <p class="lead"
+         data-en="Setup, first repository and free publishing of your project. Clear explanations in English or Spanish."
+         data-es="Instalación, primer repositorio y publicación gratis de tu proyecto. Explicaciones claras en español o inglés.">
+        Setup, first repository and free publishing of your project. Clear explanations in English or Spanish.
+      </p>
+      <a class="btn" href="https://www.fiverr.com/yeissonrd" target="_blank" rel="noopener"
+         data-en="See my services on Fiverr" data-es="Ver mis servicios en Fiverr">See my services on Fiverr</a>
+    </div>
+
+    <div class="terminal mono" aria-label="Terminal example">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div id="termOut"></div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <h2 data-en="Services" data-es="Servicios">Services</h2>
+    <p class="sub" data-en="Simple tasks, done right and explained." data-es="Tareas sencillas, bien hechas y explicadas.">Simple tasks, done right and explained.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">⚙️</div>
+        <h3 data-en="Git & VS Code setup" data-es="Instalar Git y VS Code">Git &amp; VS Code setup</h3>
+        <p data-en="Install and configure Git, VS Code and the essential extensions on your computer."
+           data-es="Instalo y configuro Git, VS Code y las extensiones esenciales en tu computador.">Install and configure Git, VS Code and the essential extensions on your computer.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📁</div>
+        <h3 data-en="Your first GitHub repo" data-es="Tu primer repositorio">Your first GitHub repo</h3>
+        <p data-en="Create your repository, upload your project and write a clean README."
+           data-es="Creo tu repositorio, subo tu proyecto y escribo un README ordenado.">Create your repository, upload your project and write a clean README.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🌐</div>
+        <h3 data-en="Publish with GitHub Pages" data-es="Publicar con GitHub Pages">Publish with GitHub Pages</h3>
+        <p data-en="Put your HTML/CSS/JS website online for free, with a shareable link."
+           data-es="Pongo tu página HTML/CSS/JS en internet gratis, con un link para compartir.">Put your HTML/CSS/JS website online for free, with a shareable link.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🧑‍🏫</div>
+        <h3 data-en="Git basics session" data-es="Clase de Git básico">Git basics session</h3>
+        <p data-en="A 1-on-1 walkthrough: add, commit, push, pull and branches, in plain words."
+           data-es="Sesión 1 a 1: add, commit, push, pull y ramas, en palabras sencillas.">A 1-on-1 walkthrough: add, commit, push, pull and branches, in plain words.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <h2 data-en="How I work" data-es="Cómo trabajo">How I work</h2>
+    <p class="sub" data-en="Three simple steps." data-es="Tres pasos sencillos.">Three simple steps.</p>
+    <div class="grid steps">
+      <div class="card">
+        <h3 data-en="You tell me your goal" data-es="Me cuentas tu objetivo">You tell me your goal</h3>
+        <p data-en="Send me a message on Fiverr with your project and your operating system."
+           data-es="Me escribes por Fiverr con tu proyecto y tu sistema operativo.">Send me a message on Fiverr with your project and your operating system.</p>
+      </div>
+      <div class="card">
+        <h3 data-en="I do it with you" data-es="Lo hago contigo">I do it with you</h3>
+        <p data-en="I complete the task and explain each step so you understand what happened."
+           data-es="Hago la tarea y te explico cada paso para que entiendas qué se hizo.">I complete the task and explain each step so you understand what happened.</p>
+      </div>
+      <div class="card">
+        <h3 data-en="You get a mini guide" data-es="Recibes una mini guía">You get a mini guide</h3>
+        <p data-en="You keep a short guide with the commands you need to keep working alone."
+           data-es="Te quedas con una guía corta con los comandos para seguir trabajando solo.">You keep a short guide with the commands you need to keep working alone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <h2 data-en="Projects" data-es="Proyectos">Projects</h2>
+    <p class="sub" data-en="Real work, versioned with Git and hosted on GitHub." data-es="Trabajo real, versionado con Git y publicado en GitHub.">Real work, versioned with Git and hosted on GitHub.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">💳</div>
+        <h3>Mi Plata</h3>
+        <p data-en="JavaScript banking app: functions, loops and localStorage. Full commit history on GitHub."
+           data-es="App bancaria en JavaScript: funciones, ciclos y localStorage. Historial de commits en GitHub.">JavaScript banking app: functions, loops and localStorage. Full commit history on GitHub.</p>
+        <a href="https://github.com/yeissonrd/mi-plata" target="_blank" rel="noopener" data-en="View repo →" data-es="Ver repositorio →">View repo →</a>
+      </div>
+      <div class="card">
+        <div class="icon">🖥️</div>
+        <h3 data-en="This portfolio" data-es="Este portafolio">This portfolio</h3>
+        <p data-en="Built in VS Code, versioned with Git and published for free with GitHub Pages."
+           data-es="Hecho en VS Code, versionado con Git y publicado gratis con GitHub Pages.">Built in VS Code, versioned with Git and published for free with GitHub Pages.</p>
+        <a href="https://github.com/yeissonrd/yeissonrd.github.io" target="_blank" rel="noopener" data-en="View repo →" data-es="Ver repositorio →">View repo →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHEAT SHEET -->
+  <section id="cheatsheet">
+    <h2 data-en="Free Git cheat sheet" data-es="Guía rápida de Git gratis">Free Git cheat sheet</h2>
+    <p class="sub" data-en="The 6 commands every beginner needs." data-es="Los 6 comandos que todo principiante necesita.">The 6 commands every beginner needs.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-en="Command" data-es="Comando">Command</th>
+            <th data-en="What it does" data-es="Qué hace">What it does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>git init</code></td><td data-en="Starts Git in your project folder." data-es="Inicia Git en la carpeta de tu proyecto.">Starts Git in your project folder.</td></tr>
+          <tr><td><code>git status</code></td><td data-en="Shows what changed." data-es="Muestra qué cambió.">Shows what changed.</td></tr>
+          <tr><td><code>git add .</code></td><td data-en="Prepares all changes to be saved." data-es="Prepara todos los cambios para guardarlos.">Prepares all changes to be saved.</td></tr>
+          <tr><td><code>git commit -m "msg"</code></td><td data-en="Saves a snapshot with a message." data-es="Guarda una versión con un mensaje.">Saves a snapshot with a message.</td></tr>
+          <tr><td><code>git push</code></td><td data-en="Uploads your commits to GitHub." data-es="Sube tus commits a GitHub.">Uploads your commits to GitHub.</td></tr>
+          <tr><td><code>git pull</code></td><td data-en="Downloads the latest changes." data-es="Descarga los últimos cambios.">Downloads the latest changes.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2 data-en="Ready to start?" data-es="¿Listo para empezar?">Ready to start?</h2>
+    <p class="sub" data-en="Message me on Fiverr and tell me what you need." data-es="Escríbeme por Fiverr y cuéntame qué necesitas.">Message me on Fiverr and tell me what you need.</p>
+    <a class="btn" href="https://www.fiverr.com/yeissonrd" target="_blank" rel="noopener"
+       data-en="Contact me on Fiverr" data-es="Contáctame en Fiverr">Contact me on Fiverr</a>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">© 2026 Yeisson · Git · GitHub · VS Code</div>
+</footer>
+
+<script>
+  // ---- Language toggle ----
+  let lang = "en";
+  const btn = document.getElementById("langBtn");
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-en]").forEach(el => {
+      el.textContent = el.dataset[lang];
+    });
+    btn.textContent = lang === "en" ? "🇪🇸 Español" : "🇺🇸 English";
+  }
+  btn.addEventListener("click", () => {
+    lang = lang === "en" ? "es" : "en";
+    applyLang();
+  });
+
+  // ---- Terminal animation ----
+  const lines = [
+    { t: "p", s: "$ git init" },
+    { t: "o", s: "Initialized empty Git repository" },
+    { t: "p", s: "$ git add ." },
+    { t: "p", s: '$ git commit -m "first commit"' },
+    { t: "o", s: "[main] first commit · 3 files changed" },
+    { t: "p", s: "$ git push -u origin main" },
+    { t: "o", s: "✔ Published on GitHub" }
+  ];
+  const out = document.getElementById("termOut");
+  let i = 0;
+  function nextLine() {
+    if (i < lines.length) {
+      const div = document.createElement("div");
+      div.className = lines[i].t;
+      div.textContent = lines[i].s;
+      out.appendChild(div);
+      i++;
+      setTimeout(nextLine, 650);
+    } else {
+      const c = document.createElement("span");
+      c.className = "cursor";
+      c.innerHTML = "&nbsp;";
+      out.appendChild(c);
+    }
+  }
+  nextLine();
+</script>
+</body>
+</html>
